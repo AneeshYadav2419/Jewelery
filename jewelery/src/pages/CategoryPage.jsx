@@ -1,33 +1,4 @@
-// import { useParams } from "react-router-dom";
-// import { productsData } from "../assets/assets";
 
-// const CategoryPage = () => {
-//   const { category } = useParams();
-
-//   const filteredProducts = productsData.filter(
-//     (item) => item.category.toLowerCase() === category
-//   );
-
-//   return (
-//     <div className="px-6 md:px-20 py-10">
-//       <h2 className="text-3xl font-bold mb-8 capitalize">
-//         {category}
-//       </h2>
-
-//       <div className="grid md:grid-cols-4 gap-6">
-//         {filteredProducts.map((product) => (
-//           <div key={product.id} className="shadow p-4 rounded">
-//             <img src={product.image} className="h-40 w-full object-cover" />
-//             <h3>{product.name}</h3>
-//             <p>{product.price}</p>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CategoryPage;
 
 import { memo } from "react";
 import { useParams, Link } from "react-router-dom";

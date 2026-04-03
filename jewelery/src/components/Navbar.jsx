@@ -3,12 +3,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { FaShoppingCart, FaBars } from "react-icons/fa";
 import { useState } from "react";
+import { useCart } from "../context/CardContext.jsx";
+
 
 const CATEGORIES = ["Rings", "Earrings", "Pendants", "Bracelets", "Necklaces"];
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const { cart } = useCart();
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 shadow-sm border-b">
@@ -24,6 +27,14 @@ const Navbar = () => {
         </Link>
         {/* DESKTOP MENU */}
         <div className="hidden md:flex gap-8 text-gray-700 font-medium">
+          <Link
+            to="/"
+            className={`relative group transition ${location.pathname === "/" ? "text-yellow-600" : ""
+              }`}
+          >
+            Home
+            <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-yellow-600 transition-all duration-300 group-hover:w-full"></span>
+          </Link>
           {CATEGORIES.map((item) => {
             const path = `/category/${item.toLowerCase()}`;
             const isActive = location.pathname === path;
@@ -45,33 +56,38 @@ const Navbar = () => {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center gap-5">
+   <div className="flex items-center gap-5">
 
-          {/* LOGIN */}
-          <Link
-            to="/login"
-            className="hidden md:block border border-yellow-600 text-yellow-600 px-4 py-1.5 rounded-full hover:bg-yellow-600 hover:text-white transition duration-300"
-          >
-            Login
-          </Link>
+  {/* LOGIN */}
+  <Link
+    to="/login"
+    className="hidden md:block border border-yellow-600 text-yellow-600 px-4 py-1.5 rounded-full hover:bg-yellow-600 hover:text-white transition duration-300"
+  >
+    Login
+  </Link>
 
-          {/* CART */}
-          <div className="relative cursor-pointer hover:scale-110 transition">
-            <FaShoppingCart size={20} />
-            <span className="absolute -top-2 -right-2 bg-yellow-600 text-white text-xs px-1.5 rounded-full">
-              0
-            </span>
-          </div>
+  {/* CART */}
+  <Link to="/cart" className="relative group">
+    <div className="p-2 rounded-full bg-gray-100 hover:bg-yellow-100 transition duration-300 shadow-sm group-hover:shadow-md">
+      <FaShoppingCart size={20} className="text-gray-700 group-hover:text-yellow-600" />
+    </div>
 
-          {/* MOBILE MENU ICON */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden hover:scale-110 transition"
-          >
-            <FaBars size={20} />
-          </button>
+    {cart.length > 0 && (
+      <span className="absolute -top-1 -right-1 bg-yellow-600 text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow">
+        {cart.length}
+      </span>
+    )}
+  </Link>
 
-        </div>
+  {/* MOBILE MENU */}
+  <button
+    onClick={() => setMenuOpen(!menuOpen)}
+    className="md:hidden hover:scale-110 transition"
+  >
+    <FaBars size={20} />
+  </button>
+
+</div>
       </div>
 
       {/* MOBILE MENU (ANIMATED) */}
