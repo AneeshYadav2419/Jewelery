@@ -1,126 +1,177 @@
-
-
-import { memo } from "react";
-import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { memo, useState, useMemo } from "react";
+import { useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { productsData } from "../assets/assets";
-
-// ✅ animation
-const container = {
-    hidden: {},
-    show: {
-        transition: { staggerChildren: 0.1 },
-    },
-};
-
-const item = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0 },
-};
+import ProductCard from "../components/ProductCard";
+import { FaFilter, FaSortAmountDown } from "react-icons/fa";
 
 const CategoryPage = () => {
-    const { category } = useParams();
+  const { category } = useParams();
+  const [sortBy, setSortBy] = useState("featured");
+  const [priceRange, setPriceRange] = useState(50000);
+  const [selectedMaterial, setSelectedMaterial] = useState("All");
 
-    const filteredProducts = productsData.filter(
-        (item) => item.category === category
-    );
+  const filteredAndSortedProducts = useMemo(() => {
+    let result = productsData.filter((item) => item.category === category);
 
-    return (
-        <section className="px-6 md:px-20 py-12 bg-gray-50 min-h-screen">
+    // Filter by price
+    result = result.filter((item) => item.price <= priceRange);
 
-            {/* HEADER */}
-            <div className="mb-10 text-center">
-                <h2 className="text-3xl md:text-5xl font-[Playfair_Display] capitalize text-gray-800">
-                    {category}
-                </h2>
-                <p className="text-gray-500 mt-2 text-sm">
-                    Discover our premium {category} collection
-                </p>
+    // Filter by material
+    if (selectedMaterial !== "All") {
+      result = result.filter((item) => item.material === selectedMaterial);
+    }
+
+    // Sort
+    if (sortBy === "price-low") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-high") {
+      result.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "rating") {
+      result.sort((a, b) => b.rating - a.rating);
+    }
+
+    return result;
+  }, [category, sortBy, priceRange, selectedMaterial]);
+
+  const materials = ["All", ...new Set(productsData.filter(p => p.category === category).map(p => p.material))];
+
+  return (
+    <div className="pt-32 pb-24 px-6 md:px-12 bg-secondary min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* HERO HEADER */}
+        <div className="relative rounded-3xl overflow-hidden bg-primary p-12 md:p-20 mb-16 text-center shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-accent/20 via-transparent to-accent/20 opacity-30"></div>
+          <motion.span 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative z-10 text-accent tracking-[0.4em] uppercase text-xs font-bold mb-4 block"
+          >
+            Exclusive Collection
+          </motion.span>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative z-10 text-4xl md:text-7xl font-serif text-white capitalize mb-4"
+          >
+            {category}
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="relative z-10 text-white/60 font-sans max-w-md mx-auto"
+          >
+            Experience the pinnacle of luxury with our hand-selected {category} collection.
+          </motion.p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-12">
+          
+          {/* FILTERS SIDEBAR */}
+          <aside className="w-full lg:w-64 space-y-10">
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <FaFilter className="text-accent" size={14} />
+                <h3 className="text-sm uppercase tracking-widest font-bold text-primary">Filters</h3>
+              </div>
+              
+              {/* PRICE FILTER */}
+              <div className="mb-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price Range</span>
+                  <span className="text-xs font-bold text-accent">₹{priceRange.toLocaleString()}</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="5000" 
+                  max="50000" 
+                  step="1000"
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(Number(e.target.value))}
+                  className="w-full accent-accent h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+
+              {/* MATERIAL FILTER */}
+              <div>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-4">Material</span>
+                <div className="flex flex-wrap gap-2">
+                  {materials.map((m) => (
+                    <button
+                      key={m}
+                      onClick={() => setSelectedMaterial(m)}
+                      className={`px-4 py-2 rounded-full text-xs font-medium border transition-all duration-300 ${
+                        selectedMaterial === m 
+                          ? "bg-primary text-white border-primary shadow-md" 
+                          : "border-gray-200 text-gray-500 hover:border-accent hover:text-accent"
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* GRID */}
-            <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
-            >
+            {/* SORTING */}
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <FaSortAmountDown className="text-accent" size={14} />
+                <h3 className="text-sm uppercase tracking-widest font-bold text-primary">Sort By</h3>
+              </div>
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent transition-colors cursor-pointer appearance-none"
+              >
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+              </select>
+            </div>
+          </aside>
 
-                {filteredProducts.map((product) => (
-                    <motion.div key={product.id} variants={item}>
+          {/* PRODUCT GRID */}
+          <div className="flex-grow">
+            <div className="flex justify-between items-center mb-8">
+              <p className="text-gray-500 text-sm">Showing <span className="text-primary font-bold">{filteredAndSortedProducts.length}</span> products</p>
+            </div>
 
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition duration-300 group">
+            <AnimatePresence mode="popLayout">
+              {filteredAndSortedProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                  {filteredAndSortedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200"
+                >
+                  <p className="text-gray-500">No products match your selected filters.</p>
+                  <button 
+                    onClick={() => {
+                      setPriceRange(50000);
+                      setSelectedMaterial("All");
+                    }}
+                    className="text-accent font-bold mt-4 underline"
+                  >
+                    Clear all filters
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-                            {/* IMAGE */}
-                            <div className="relative overflow-hidden">
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    loading="lazy"
-                                    className="w-full h-60 object-cover group-hover:scale-110 transition duration-500"
-                                />
-
-                                {/* BADGE */}
-                                <span className="absolute top-3 left-3 bg-yellow-600 text-white text-xs px-2 py-1 rounded-full">
-                                    New
-                                </span>
-
-                                {/* QUICK VIEW */}
-                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                                    <Link
-                                        to={`/product/${product.id}`}
-                                        className="bg-white text-black px-4 py-2 rounded-full text-sm hover:bg-yellow-600 hover:text-white transition"
-                                    >
-                                        View Details
-                                    </Link>
-                                </div>
-                            </div>
-
-                            {/* CONTENT */}
-                            <div className="p-4 text-center">
-
-                                <h3 className="text-lg font-semibold text-gray-800">
-                                    {product.name}
-                                </h3>
-
-                                {/* ⭐ RATING (fake for UI) */}
-                                <div className="text-yellow-500 text-sm mt-1">
-                                    ★★★★☆
-                                </div>
-
-                                {/* ✅ SHORT DESCRIPTION */}
-                                <p className="text-gray-500 text-xs mt-2 line-clamp-2">
-                                    {product.description}
-                                </p>
-
-                                <p className="text-yellow-600 font-bold mt-2 text-lg">
-                                    ₹{product.price.toLocaleString()}
-                                </p>
-
-
-                                {/* BUTTON */}
-                                <button className="mt-4 w-full bg-yellow-600 text-white py-2 rounded-full hover:bg-yellow-700 transition duration-300">
-                                    Add to Cart
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </motion.div>
-                ))}
-
-            </motion.div>
-
-            {/* EMPTY STATE */}
-            {filteredProducts.length === 0 && (
-                <p className="text-center text-gray-500 mt-10">
-                    No products found
-                </p>
-            )}
-
-        </section>
-    );
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default memo(CategoryPage);

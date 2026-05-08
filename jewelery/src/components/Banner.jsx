@@ -1,189 +1,71 @@
-// import bannerImg from "../assets/banner.png";
-// import ring from "../assets/ring.png";
-
-// const Banner = () => {
-//   return (
-//     <section className="w-full max-w-7xl mx-auto px-6 py-16 space-y-16">
-
-//       {/* ROW 1 */}
-//       <div className="grid md:grid-cols-2 gap-10 items-center">
-
-//         {/* LEFT IMAGE */}
-//         <div className="overflow-hidden rounded-xl">
-//           <img
-//             src={ring}
-//             alt="ring"
-//             className="w-full h-[300px] md:h-[400px] object-cover rounded-xl hover:scale-105 transition duration-500"
-//           />
-//         </div>
-
-//         {/* RIGHT CONTENT */}
-//         <div className="text-center md:text-left">
-//           <h1 className="font-[Playfair_Display] text-3xl md:text-5xl text-gray-800 leading-tight">
-//             Jewelry That Tells Your Story in <br />
-//             <span className="text-yellow-600">Sparkling Detail</span>
-//           </h1>
-
-//           <p className="mt-4 text-gray-600 text-sm md:text-base max-w-md">
-//             Celebrate life’s special moments with exquisite pieces designed for
-//             love, beauty, and elegance.
-//           </p>
-
-//           <button className="mt-6 px-6 py-2 border border-yellow-600 text-yellow-600 rounded-full hover:bg-yellow-600 hover:text-white transition">
-//             SHOP NOW →
-//           </button>
-//         </div>
-
-//       </div>
-
-//       {/* ROW 2 */}
-//       <div className="grid md:grid-cols-2 gap-10 items-center">
-
-//   {/* IMAGE (mobile pe first) */}
-//   <div className="overflow-hidden rounded-xl order-1 md:order-2">
-//     <img
-//       src={bannerImg}
-//       alt="banner"
-//       className="w-full h-[300px] md:h-[400px] object-cover rounded-xl hover:scale-105 transition duration-500"
-//     />
-//   </div>
-
-//   {/* TEXT (mobile pe second) */}
-//   <div className="text-center md:text-left order-2 md:order-1">
-//     <h1 className="font-[Playfair_Display] text-3xl md:text-5xl text-gray-800 leading-tight">
-//       Adorn Yourself with Jewelry That <br />
-//       <span className="text-yellow-600">Captures Your Essence</span>
-//     </h1>
-
-//     <p className="mt-4 text-gray-600 text-sm md:text-base max-w-md">
-//       Each piece is carefully designed to celebrate your individuality.
-//     </p>
-
-//     <button className="mt-6 px-6 py-2 border border-yellow-600 text-yellow-600 rounded-full hover:bg-yellow-600 hover:text-white transition">
-//       SHOP NOW →
-//     </button>
-//   </div>
-
-// </div>
-
-//     </section>
-//   );
-// };
-
-// export default Banner;
 import { memo } from "react";
 import { motion } from "framer-motion";
-import bannerImg from "../assets/banner.png"; // ✅ use webp
+import bannerImg from "../assets/banner.png";
 import ring from "../assets/ring.png";
 
-// ✅ animation variants (outside = performance)
-const container = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.2,
-    },
-  },
-};
+const BannerSection = ({ image, title, subtitle, description, reverse = false }) => {
+  return (
+    <div className={`flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-12 md:gap-24 py-20`}>
+      <motion.div 
+        initial={{ opacity: 0, x: reverse ? 50 : -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1 }}
+        className="flex-1 relative group"
+      >
+        <div className="absolute -inset-4 border border-accent/20 rounded-2xl -z-10 group-hover:inset-0 transition-all duration-700"></div>
+        <div className="overflow-hidden rounded-2xl aspect-square md:aspect-video">
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+          />
+        </div>
+      </motion.div>
 
-const item = {
-  hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0 },
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.2, duration: 0.8 }}
+        className="flex-1 text-center md:text-left"
+      >
+        <span className="text-accent tracking-[0.4em] uppercase text-xs font-bold mb-4 block">
+          {subtitle}
+        </span>
+        <h2 className="text-4xl md:text-5xl font-serif text-primary mb-6 leading-tight">
+          {title}
+        </h2>
+        <p className="text-gray-500 text-lg mb-8 leading-relaxed">
+          {description}
+        </p>
+        <button className="luxury-button">
+          Discover More
+        </button>
+      </motion.div>
+    </div>
+  );
 };
 
 const Banner = () => {
   return (
-    <section className="w-full max-w-7xl mx-auto px-6 py-20 space-y-20">
-      
-      {/* ROW 1 */}
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="grid md:grid-cols-2 gap-12 items-center"
-      >
-
-        {/* LEFT IMAGE */}
-        <motion.div variants={item} className="overflow-hidden rounded-2xl shadow-md">
-          <img
-            src={ring}
-            alt="ring"
-            loading="lazy" // ✅ performance
-            className="w-full h-[300px] md:h-[420px] object-cover rounded-2xl transition duration-500 hover:scale-105"
-          />
-        </motion.div>
-
-        {/* RIGHT CONTENT */}
-        <motion.div variants={item} className="text-center md:text-left">
-          <h1 className="font-[Playfair_Display] text-3xl md:text-5xl text-gray-800 leading-tight tracking-wide">
-            Jewelry That Tells Your Story in <br />
-            <span className="text-yellow-600">Sparkling Detail</span>
-          </h1>
-
-          <p className="mt-5 text-gray-600 text-sm md:text-base max-w-md leading-relaxed">
-            Celebrate life’s special moments with exquisite pieces designed for
-            love, beauty, and elegance.
-          </p>
-
-          <motion.button
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-6 px-6 py-2 border border-yellow-600 text-yellow-600 rounded-full hover:bg-yellow-600 hover:text-white transition duration-300"
-          >
-            SHOP NOW →
-          </motion.button>
-        </motion.div>
-
-      </motion.div>
-
-      {/* ROW 2 */}
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="grid md:grid-cols-2 gap-12 items-center"
-      >
-
-        {/* IMAGE */}
-        <motion.div
-          variants={item}
-          className="overflow-hidden rounded-2xl shadow-md order-1 md:order-2"
-        >
-          <img
-            src={bannerImg}
-            alt="banner"
-            loading="lazy"
-            className="w-full h-[300px] md:h-[420px] object-cover rounded-2xl transition duration-500 hover:scale-105"
-          />
-        </motion.div>
-
-        {/* TEXT */}
-        <motion.div
-          variants={item}
-          className="text-center md:text-left order-2 md:order-1"
-        >
-          <h1 className="font-[Playfair_Display] text-3xl md:text-5xl text-gray-800 leading-tight tracking-wide">
-            Adorn Yourself with Jewelry That <br />
-            <span className="text-yellow-600">Captures Your Essence</span>
-          </h1>
-
-          <p className="mt-5 text-gray-600 text-sm md:text-base max-w-md leading-relaxed">
-            Each piece is carefully designed to celebrate your individuality.
-          </p>
-
-          <motion.button
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-6 px-6 py-2 border border-yellow-600 text-yellow-600 rounded-full hover:bg-yellow-600 hover:text-white transition duration-300"
-          >
-            SHOP NOW →
-          </motion.button>
-        </motion.div>
-
-      </motion.div>
-
+    <section className="bg-secondary px-6 md:px-12">
+      <div className="max-w-7xl mx-auto divide-y divide-gray-200">
+        <BannerSection 
+          image={ring}
+          subtitle="Timeless Elegance"
+          title="Crafted with Love, Designed for Life"
+          description="Every piece in our collection is a testament to the beauty of hand-selected gemstones and meticulous craftsmanship, designed to be cherished for generations."
+        />
+        <BannerSection 
+          image={bannerImg}
+          subtitle="Modern Luxury"
+          title="Adorn Yourself with Pure Brilliance"
+          description="Experience the perfect fusion of contemporary design and classic luxury. Our pieces are more than jewelry; they are a celebration of your unique essence."
+          reverse={true}
+        />
+      </div>
     </section>
   );
 };

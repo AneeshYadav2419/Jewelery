@@ -1,44 +1,45 @@
 
 
-import Navbar from './components/Navbar'
-import Hero from './components/HeroSection'
-import ShopCategory from './components/ShopCategory'
-import Products from './components/Products'
-import Banner from './components/Banner'
-import Footer from './components/Footer'
-import CategoryPage from './pages/CategoryPage'
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import ProductDetails from './pages/ProductDetails'
-import CartPage from './pages/CartPage'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 
-const Home = () => {
-  return (
-    <>
-      <Hero />
-      <ShopCategory />
-      <Products />
-      <Banner />
-    </>
-  );
-};
+// Lazy Loading Pages
+const Home = lazy(() => import('./pages/Home'))
+const CategoryPage = lazy(() => import('./pages/CategoryPage'))
+const ProductDetails = lazy(() => import('./pages/ProductDetails'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const WishlistPage = lazy(() => import('./pages/WishlistPage'))
+
+// Loading Component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+  </div>
+)
 
 const App = () => {
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* ✅ ROUTES */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/category/:category" element={<CategoryPage />} />
-        <Route path='/product/:id' element={<ProductDetails />}/>
-        <Route path='/cart' element={<CartPage />}/>
-        
-      </Routes>
+      <main className="flex-grow">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/category/:category" element={<CategoryPage />} />
+            <Route path='/product/:id' element={<ProductDetails />}/>
+            <Route path='/cart' element={<CartPage />}/>
+            <Route path='/wishlist' element={<WishlistPage />}/>
+          </Routes>
+        </Suspense>
+      </main>
 
       <Footer />
     </div>
   );
 };
+
 
 export default App;
